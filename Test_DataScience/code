@@ -1,1 +1,90 @@
+## Este repositório trata-se de uma análise do volume de vendas de uma rede de supermercados na semanas que precedem alguns feriados nacionais ##
+#Os dados para analise correspondem a dados históricos de vendas de 45 lojas Walmart localizadas em diferentes regiões. 
+#Cada loja contém vários departamentosafio consiste em prever as vendas em todo os departamentos para cada loja,
+#por meio de uma modelagem que consiga identificar os efeitos de remarcações nessas semanas de férias na ausência de dados históricos completos / ideais.
 
+## Importe as bilbiotecas##
+import itertools
+import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib.ticker import NullFormatter
+import pandas as pd
+import numpy as np
+import matplotlib.ticker as ticker
+from sklearn import preprocessing
+import os
+%matplotlib inline
+
+pwd
+
+
+## Carregue o dataframe ##
+#Os arquivos podem ser encontrados em https://www.kaggle.com/c/walmart-recruiting-store-sales-forecasting/data
+#e correspondem: 
+
+#stores.csv#
+#Este arquivo contém informações anônimas sobre as 45 lojas, indicando o tipo e tamanho da loja.
+
+#train.csv#
+#Esses são os dados históricos do treinamento, que abrangem desde 05-02-2010 a 01/11/2012. Dentro deste arquivo, você encontrará os seguintes campos:
+
+#Loja - o número da loja
+#Departamento - o número do departamento
+#Data - a semana
+#Weekly_Sales - vendas para o departamento especificado na loja especificada
+#IsHoliday - se a semana é uma semana especial de férias
+
+#test.csv#
+#Este arquivo é idêntico ao train.csv, exceto que retivemos as vendas semanais. Você deve prever as vendas para cada trigêmeo de loja, departamento e data neste arquivo.
+
+#features.csv#
+#Este arquivo contém dados adicionais relacionados à loja, departamento e atividade regional para as datas especificadas. Ele contém os seguintes campos:
+
+#Loja - o número da loja
+#Data - a semana
+#Temperatura - temperatura média na região
+#Fuel_Price - custo do combustível na região
+#MarkDown1-5 - dados anonimizados relacionados a descontos promocionais que o Walmart está executando. Os dados do MarkDown estão disponíveis somente após novembro de 2011 e não estão disponíveis para todas as lojas o tempo todo. Qualquer valor ausente é marcado com um NA.
+#CPI - o índice de preços ao consumidor
+#Desemprego - a taxa de desemprego
+#IsHoliday - se a semana é uma semana especial de férias
+#Por conveniência, os quatro feriados se enquadram nas semanas seguintes no conjunto de dados (nem todos os feriados estão nos dados):
+
+#Super Bowl: 12-fev-10, 11-fev-11, 10-fev-12, 8-fev-13
+#Dia do Trabalhador: 10-set-10, 9-set-11, 7-set-12, 6-set -13
+#Ação de Graças: 26-Nov-10, 25-Nov-11, 23-Nov-12, 29-Nov-13
+#Natal: 31-Dez-10, 30-Dez-11, 28-Dez-12, 27-Dez -13
+
+fat = pd.read_csv('features.csv')
+lj = pd.read_csv('stores.csv')
+tst = pd.read_csv('test.csv')
+tt = pd.read_csv('train.csv')
+ss = pd.read_csv('sampleSubmission.csv')
+
+## Preparação do Dados ##
+#viasualiza previamente 5 linha do arquivo 'features.csv'
+fat.head (5)
+
+#Converte date to object do arquivo 'features.csv'# 
+fat['Date'] = pd.to_datetime(fat['Date']) #indica o titulo da coluna que quer converter 
+fat.head(2)
+tst['Date'] = pd.to_datetime(tst['Date']) #indica o titulo da coluna que quer converter 
+tst.head(2)
+tt['Date'] = pd.to_datetime(tt['Date']) #indica o titulo da coluna que quer converter 
+tt.head(2)
+
+## Visualização e pré-processamento de dados ##
+ fat['IsHoliday'] . value_counts ()
+ tt['IsHoliday'] . value_counts ()
+ 
+ # notice: installing seaborn might takes a few minutes
+!conda install -c anaconda seaborn -y
+
+import seaborn as sns
+
+bins = np.linspace(tt.Weekly_Sales.min(), tt.Weekly_Sales.max(), 10)
+g = sns.FacetGrid(tt, col="IsHoliday", hue="Store", palette="Set2", col_wrap=2)
+g.map(plt.hist, 'Weekly_Sales', bins=bins, ec="k")
+
+g.axes[-1].legend()
+plt.show()
